@@ -30,8 +30,12 @@ import android.widget.Toast;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
@@ -44,6 +48,7 @@ import java.util.UUID;
 import ru.androidtestapp.androidfooddeliveryserver.Common.Common;
 import ru.androidtestapp.androidfooddeliveryserver.Interface.ItemClickListener;
 import ru.androidtestapp.androidfooddeliveryserver.Model.Category;
+import ru.androidtestapp.androidfooddeliveryserver.Service.ListenOrder;
 import ru.androidtestapp.androidfooddeliveryserver.ViewHolder.MenuViewHolder;
 
 public class Home extends AppCompatActivity
@@ -119,6 +124,10 @@ public class Home extends AppCompatActivity
 		recycler_menu.setLayoutManager( layoutManager );
 		
 		loadMenu();
+		
+		//Call Service
+		Intent service = new Intent( Home.this, ListenOrder.class );
+		startService( service );
 	}
 	
 	private void showDialog( ) {
@@ -346,6 +355,23 @@ public class Home extends AppCompatActivity
 	}
 	
 	private void deleteCategory( String key ) {
+		
+		DatabaseReference foods = database.getReference("Food");
+		Query foodInCategory = foods.orderByChild( "menuId" ).equalTo( key );
+		foodInCategory.addListenerForSingleValueEvent( new ValueEventListener( ) {
+			@Override
+			public void onDataChange( @NonNull DataSnapshot dataSnapshot ) {
+				for(DataSnapshot postSnapShot:dataSnapshot.getChildren()){
+					postSnapShot.getRef().removeValue();
+				}
+			}
+			
+			@Override
+			public void onCancelled( @NonNull DatabaseError databaseError ) {
+			
+			}
+		} );
+		
 		categories.child( key ).removeValue();
 		Toast.makeText( this, "Item deleted !!!", Toast.LENGTH_SHORT ).show();
 	}
