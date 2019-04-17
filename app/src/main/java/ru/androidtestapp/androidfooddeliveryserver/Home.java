@@ -36,6 +36,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
@@ -48,7 +49,7 @@ import java.util.UUID;
 import ru.androidtestapp.androidfooddeliveryserver.Common.Common;
 import ru.androidtestapp.androidfooddeliveryserver.Interface.ItemClickListener;
 import ru.androidtestapp.androidfooddeliveryserver.Model.Category;
-import ru.androidtestapp.androidfooddeliveryserver.Service.ListenOrder;
+import ru.androidtestapp.androidfooddeliveryserver.Model.Token;
 import ru.androidtestapp.androidfooddeliveryserver.ViewHolder.MenuViewHolder;
 
 public class Home extends AppCompatActivity
@@ -125,10 +126,18 @@ public class Home extends AppCompatActivity
 		
 		loadMenu();
 		
-		//Call Service
-		Intent service = new Intent( Home.this, ListenOrder.class );
-		startService( service );
+		//Send token
+		updateToken( FirebaseInstanceId.getInstance().getToken(  ) );
+		
 	}
+	
+	private void updateToken( String token ) {
+		FirebaseDatabase db = FirebaseDatabase.getInstance();
+		DatabaseReference tokens = db.getReference("Tokens");
+		Token data = new Token(token, true);
+		tokens.child( Common.currentUser.getPhone() ).setValue( data );
+	}
+	
 	
 	private void showDialog( ) {
 		AlertDialog.Builder alertDialog = new AlertDialog.Builder( Home.this );

@@ -7,6 +7,8 @@ import android.graphics.Paint;
 
 import ru.androidtestapp.androidfooddeliveryserver.Model.Request;
 import ru.androidtestapp.androidfooddeliveryserver.Model.User;
+import ru.androidtestapp.androidfooddeliveryserver.Remote.APIService;
+import ru.androidtestapp.androidfooddeliveryserver.Remote.FCMRetrofitClient;
 import ru.androidtestapp.androidfooddeliveryserver.Remote.IGeoCoordinates;
 import ru.androidtestapp.androidfooddeliveryserver.Remote.RetrofitClient;
 
@@ -17,9 +19,13 @@ public class Common {
 	public static final String UPDATE = "Update";
 	public static final String DELETE = "Delete";
 	
+	public static String PHONE_TEXT = "userPhone";
+	
 	public static int PICK_IMAGE_REQUEST = 71;
 	
 	public static final String baseUrl = "https://maps.googleapis.com";
+	
+	public static final String fcmUrl = "https://fcm.googleapis.com/";
 	
 	public static String converCodeToStatus(String code){
 		if(code.equals( "0" )){
@@ -29,6 +35,10 @@ public class Common {
 		} else {
 			return "Shipped";
 		}
+	}
+	
+	public static APIService getFCMClient(){
+		return FCMRetrofitClient.getClient( fcmUrl ).create( APIService.class );
 	}
 	
 	public static IGeoCoordinates getGeoCodeService(){
